@@ -20,10 +20,7 @@
     </div>
 </body>
 <script>
-    //function init(){
-    //    reader = new FileReader()
-    //    reader.readAsDataURL(input.files[0]);
-    //                
+               
     var img = new Image()
     img.src = "images/circle.jpeg";
 
@@ -35,7 +32,7 @@
     c.height = height
 
 
-    //context.drawImage(img, 0, 0);
+    context.drawImage(img, 0, 0);
 
     //collect img data, draw image
     var imgData = context.getImageData(0, 0, canvas.width, canvas.height)
@@ -64,27 +61,40 @@
             bools += "1"
         }
     }
-    
-    context.drawImage(img, 0, 0)
-
-function bools(){
-    var str = ""
-    for (var i = 0; i < data.length / 4; i++) {
-        if (i % imgData.width === 0)
-            str += "\n\n"
-        // find closest pixel and distance to it
-        str += bools[i] + "  "
-    }
-}
-    //document.write(str)
-    //console.log(str)
-    //replace image with new
+    //context.drawImage(img, 0, 0)
 
     imgData.data = data
     context.putImageData(imgData, 0, 0);
+    createArray()
     //}
+    
+    
+//function createArray(){
+//    var x = 0
+//    var str = [[]]
+//    var temp = []
+//    for (var i = 0; i < data.length / 4; i++) {
+//        if(i%imgData.width == 0){
+//            str += temp
+//            temp = []
+//        }
+//        temp+= bools[i]
+//    }
+//    console.log(str)
+//}
 
-
+function distCalc(){
+    var numbers = []
+    for (var i = 0; i < data.length / 4; i++){
+        //find distance to square with number "1"
+        //calculate color 
+        //replace color
+    }
+    //redraw
+}    
+    
+    
+    
 </script>
 <!--<script src="vue.min.js"></script>-->
 <!--
