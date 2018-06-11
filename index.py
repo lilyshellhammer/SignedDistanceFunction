@@ -16,50 +16,91 @@ height = im.size[1]
 print pix[width-1,height-1]
 arr = []
 col = []
-
+max = 0
 #im.save(file + ".thumbnail", "JPEG")
-def imageStart():
-    for x in range(0, im.size[0]):
-        for y in range(0, im.size[1]):
-            if(y == 0 and x != 0):
-                arr.append(col)
-                col = []
-            r = (pix[x,y])[0]
-            g = (pix[x,y])[1]
-            b = (pix[x,y])[2]
-            if ((r + g + b) >= (225 * 3) ):
-                pix[x,y] = (0,0,0)
-                col.append(0)   
-            else:
-                pix[x,y] = (255,255,255)
-                col.append(-1)
+#def imageStart():
+for x in range(0, im.size[0]):
+    for y in range(0, im.size[1]):
+        if(y == 0 and x != 0):
+            arr.append(col)
+            col = []
+        r = (pix[x,y])[0]
+        g = (pix[x,y])[1]
+        b = (pix[x,y])[2]
+        if ((r + g + b) >= (225 * 3) ):
+            pix[x,y] = (0,0,0)
+            col.append(0)   
+        else:
+            pix[x,y] = (255,255,255)
+            col.append(900000)
 
-    count = 0
+#count = 0
 
-    #for sweep in range(0,4):
+#for sweep in range(0,4):
+for x in range(0, width-2):
+    for y in range(0, height-2):
+        if(arr[x][y] == 0):
+            if(x+1 <= width-1):         # x+1
+                if(arr[x+1][y] != 0 and arr[x+1][y] != 1):
+                    arr[x+1][y] == 1
+#                    count+=1
+            if(x-1 >= 0):               # x-1
+                if(arr[x-1][y] != 0 and arr[x-1][y] != 1):
+                    arr[x-1][y] == 1
+#                    count+=1
+            if(y+1 <= height-1):        # y+1
+                if(arr[x][y+1] != 0 and arr[x][y+1] != 1):
+                    arr[x][y+1] == 1
+#                    count+=1
+            if(y-1 >= 0):               # y-1
+                if(arr[x][y-1] != 0 and arr[x][y-1] != 1):
+                    arr[x][y-1] == 1
+#                    count+=1
+
+maxM = 0.01
+
+#def fastSweep():
+for sweep in range(0,4):
     for x in range(0, width-2):
         for y in range(0, height-2):
-            if(arr[x][y] == 0):
-                if(x+1 <= width-1):         # x+1
-                    if(arr[x+1][y] != 0 and arr[x+1][y] != 1):
-                        arr[x+1][y] == 1
-                        count+=1
-                if(x-1 >= 0):               # x-1
-                    if(arr[x-1][y] != 0 and arr[x-1][y] != 1):
-                        arr[x-1][y] == 1
-                        count+=1
-                if(y+1 <= height-1):        # y+1
-                    if(arr[x][y+1] != 0 and arr[x][y+1] != 1):
-                        arr[x][y+1] == 1
-                        count+=1
-                if(y-1 >= 0):               # y-1
-                    if(arr[x][y-1] != 0 and arr[x][y-1] != 1):
-                        arr[x][y-1] == 1
-                        count+=1
+            if(x+1 <= width-1): 
+                if(arr[x+1][y] < arr[x][y]):
+                    arr[x][y] = arr[x+1][y] + 1
 
-
+for sweep in range(0,4):
     for x in range(0, width-2):
         for y in range(0, height-2):
-            pix[x][y]
+            if(x-1 >= 0): 
+                if(arr[x-1][y] < arr[x][y]):
+                    arr[x][y] = arr[x-1][y] + 1
+
+for sweep in range(0,4):
+    for x in range(0, width-2):
+        for y in range(0, height-2):
+            if(y+1 <= height-1): 
+                if(arr[x][y+1] < arr[x][y]):
+                    arr[x][y] = arr[x][y+1] + 1
+
+for sweep in range(0,4):
+    for x in range(0, width-2):
+        for y in range(0, height-2):
+            if(y-1 >= 0): 
+                if(arr[x][y-1] < arr[x][y]):
+                    arr[x][y] = arr[x][y-1] + 1
+
+
+for x in range(0, width-2):
+    for y in range(0, height-2):
+        if(arr[x][y] > maxM):
+            maxM = arr[x][y]
+
+
+print arr
+print maxM 
+
+#def paint():
+pix[x,y] = (255-(255*(arr[x][y]//maxM)), 255, 255)
+    
+
 
 im.save('circle.png')
