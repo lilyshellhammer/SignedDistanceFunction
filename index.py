@@ -36,7 +36,7 @@ for x in range(0, im.size[0]):
 
 #count = 0
 
-#for sweep in range(0,4):
+#initally find all pixels that border a shape
 for x in range(0, width-2):
     for y in range(0, height-2):
         if(arr[x][y] == 0):
@@ -63,42 +63,43 @@ maxM = 0.01
 for sweep in range(0,4):
     for x in range(0, width-2):
         for y in range(0, height-2):
-            if(x+1 <= width-1): 
-                if(arr[x+1][y] < arr[x][y]):
-                    arr[x][y] = arr[x+1][y] + 1
+#            ULtoLR
+#            LLtoUR
+#            LRtoUL
+#            URtoLL 
+            
+            
+#            if(x+1 <= width-1): 
+#                if(arr[x+1][y] < arr[x][y]):
+#                    arr[x][y] = arr[x+1][y] + 1
+#
+#
+#            if(x-1 >= 0): 
+#                if(arr[x-1][y] < arr[x][y]):
+#                    arr[x][y] = arr[x-1][y] + 1
+#
+#
+#            if(y+1 <= height-1): 
+#                if(arr[x][y+1] < arr[x][y]):
+#                    arr[x][y] = arr[x][y+1] + 1
+#
+#
+#            if(y-1 >= 0): 
+#                if(arr[x][y-1] < arr[x][y]):
+#                    arr[x][y] = arr[x][y-1] + 1
 
-for sweep in range(0,4):
-    for x in range(0, width-2):
-        for y in range(0, height-2):
-            if(x-1 >= 0): 
-                if(arr[x-1][y] < arr[x][y]):
-                    arr[x][y] = arr[x-1][y] + 1
 
-for sweep in range(0,4):
-    for x in range(0, width-2):
-        for y in range(0, height-2):
-            if(y+1 <= height-1): 
-                if(arr[x][y+1] < arr[x][y]):
-                    arr[x][y] = arr[x][y+1] + 1
-
-for sweep in range(0,4):
-    for x in range(0, width-2):
-        for y in range(0, height-2):
-            if(y-1 >= 0): 
-                if(arr[x][y-1] < arr[x][y]):
-                    arr[x][y] = arr[x][y-1] + 1
-
-
+# FIND MAX
 for x in range(0, width-2):
     for y in range(0, height-2):
         if(arr[x][y] > maxM):
             maxM = arr[x][y]
 
-
+# error check lmao
 print arr
 print maxM 
 
-#def paint():
+# paint screen
 pix[x,y] = (255-(255*(arr[x][y]//maxM)), 255, 255)
     
 
