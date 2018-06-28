@@ -20,7 +20,7 @@ row = 10
 -------------------------------------------
 -- FindMin calls the 4 "sweep" functions, in accordance with the fast sweeping method pseudocode
 -------------------------------------------
-fsm :: [Int] -> [Int]
+fsm :: [Float] -> [Float]
 fsm list =  (funcURtoLL (funcLLtoUR (funcULtoLR list [] 0 list) [] 0 (funcULtoLR list [] 0 list)) [] 0 (funcLLtoUR (funcULtoLR list [] 0 list) [] 0 (funcULtoLR list [] 0 list)))
 
 
@@ -46,13 +46,45 @@ fsm list =  (funcURtoLL (funcLLtoUR (funcULtoLR list [] 0 list) [] 0 (funcULtoLR
 --         a ++ [oldList!!(n + 1)]
 --       cleanEdges ( n+1 )  (newList ++ [minimum (map abs a)] ) tail(oldList)
 
+------------------------------------------
 
+------------------------------------------
+diag :: Int -> Float
+diag n =
+  if (n >= 4) then
+    1.0
+  else 0.0
+------------------------------------------
+-- return minimum of list multiplied by its sign
+------------------------------------------
+minimumSign :: [Float] -> Float -> Int -> Float
+minimumSign (0:y:xs) n count = 0
+minimumSign [a] n count = n
+minimumSign (x:y:xs) 0.0 0 =
+  let
+   xSign = x/(abs(x)) -- gives -1 or +1
+   ySign = y/(abs(y))
+  in
+   if ( ( abs(x) ) < ( abs(y) ) ) then
+      minimumSign (x:xs) x 1
+   else
+     minimumSign (y:xs) y 1
+
+minimumSign (x:y:xs) n count =
+  let
+   xNew = x + (x/abs(x)) * (1 + (0.4 * diag(count))) -- gives -1 or +1
+   yNew = y + (y/abs(y)) * (1 + (0.4 * diag(count)))
+  in
+    if ( ( abs(xNew) )   < ( abs(yNew) ) ) then
+       minimumSign (x:xs) xNew (count+1)
+    else
+      minimumSign (y:xs) yNew (count+1)
 
 -------------------------------------------
 -- Sweep upper lef to lower right
 -- params: original list, list [0..n-1], nth element we are looking at, list [n+1..end]
 -------------------------------------------
-funcULtoLR :: [Int] -> [Int] -> Int -> [Int] -> [Int]
+funcULtoLR :: [Float] -> [Float] -> Int -> [Float] -> [Float]
 -- base case, empty list
 funcULtoLR g list _ [] = list
 -- find all surrounding cells of a cell and see which has the smallest distance
@@ -65,23 +97,23 @@ funcULtoLR g beginList n endList =
         funcULtoLR g (beginList ++ [g!!(n)]) (n+1) (tail(endList))      -- if at a boundary, dont check cells outside
       else
         funcULtoLR g (beginList ++
-              [minimum [ abs ( g!!(n) ),
-                         abs ( g!!(n+1)   + 1),
-                         abs ( g!!(n-1)   + 1),
-                         abs ( g!!(n+col) + 1),
-                         abs ( g!!(n-col) + 1),
-                         abs ( g!!(n+col-1) + 1), --diagonals
-                         abs ( g!!(n+col+1) + 1),
-                         abs ( g!!(n-col-1) + 1),
-                         abs ( g!!(n-col+1) + 1)
-                        ]
+              [ minimumSign [ g!!(n),
+                              g!!(n+1),
+                              g!!(n-1),
+                              g!!(n+col),
+                              g!!(n-col),
+                              g!!(n+col-1), --diagonals
+                              g!!(n+col+1),
+                              g!!(n-col-1),
+                              g!!(n-col+1)
+                        ] 0.0 0
               ] )   (n+1)  (tail(endList))
 
 -------------------------------------------
 -- Sweep upper lef to lower right
 -- params: original list, list [0..n-1], nth element we are looking at, list [n+1..end]
 -------------------------------------------
-funcLLtoUR :: [Int] -> [Int] -> Int -> [Int] -> [Int]
+funcLLtoUR :: [Float] -> [Float] -> Int -> [Float] -> [Float]
 -- base case, empty list
 funcLLtoUR g list _ [] = list
 -- find all surrounding cells of a cell and see which has the smallest distance
@@ -94,23 +126,22 @@ funcLLtoUR g beginList n endList =
         funcLLtoUR g (beginList ++ [g!!(n)]) (n+1) (tail(endList))
       else
         funcLLtoUR g (beginList ++
-              [minimum [ abs ( g!!(n) ),
-                         abs ( g!!(n+1)   + 1),
-                         abs ( g!!(n-1)   + 1),
-                         abs ( g!!(n+col) + 1),
-                         abs ( g!!(n-col) + 1),
-                         abs ( g!!(n+col-1) + 1), --diagonals
-                         abs ( g!!(n+col+1) + 1),
-                         abs ( g!!(n-col-1) + 1),
-                         abs ( g!!(n-col+1) + 1)
-                        ]
-              ] )   (n+1)  (tail(endList))
-
+        [ minimumSign [ g!!(n),
+                        g!!(n+1),
+                        g!!(n-1),
+                        g!!(n+col),
+                        g!!(n-col),
+                        g!!(n+col-1), --diagonals
+                        g!!(n+col+1),
+                        g!!(n-col-1),
+                        g!!(n-col+1)
+                  ] 0.0 0
+        ] )   (n+1)  (tail(endList))
 -------------------------------------------
 -- Sweep upper right to lower left
 -- params: original list, list [0..n-1], nth element we are looking at, list [n+1..end]
 -------------------------------------------
-funcURtoLL :: [Int] -> [Int] -> Int -> [Int] -> [Int]
+funcURtoLL :: [Float] -> [Float] -> Int -> [Float] -> [Float]
 -- base case, empty list
 funcURtoLL g list _ [] = list
 -- find all surrounding cells of a cell and see which has the smallest distance
@@ -123,23 +154,23 @@ funcURtoLL g beginList n endList =
         funcURtoLL g (beginList ++ [g!!(n)]) (n+1) (tail(endList))
       else
         funcURtoLL g (beginList ++
-              [minimum [ abs ( g!!(n) ),
-                         abs ( g!!(n+1)   + 1),
-                         abs ( g!!(n-1)   + 1),
-                         abs ( g!!(n+col) + 1),
-                         abs ( g!!(n-col) + 1),
-                         abs ( g!!(n+col-1) + 1), --diagonals
-                         abs ( g!!(n+col+1) + 1),
-                         abs ( g!!(n-col-1) + 1),
-                         abs ( g!!(n-col+1) + 1)
-                        ]
-              ] )   (n+1)  (tail(endList))
+        [ minimumSign [ g!!(n),
+                        g!!(n+1),
+                        g!!(n-1),
+                        g!!(n+col),
+                        g!!(n-col),
+                        g!!(n+col-1), --diagonals
+                        g!!(n+col+1),
+                        g!!(n-col-1),
+                        g!!(n-col+1)
+                  ] 0.0 0
+        ] )   (n+1)  (tail(endList))
 
 -------------------------------------------
 -- Sweep lower right to upper left
 -- params: original list, list [0..n-1], nth element we are looking at, list [n+1..end]
 -------------------------------------------
-funcLRtoUL :: [Int] -> [Int] -> Int -> [Int] -> [Int]
+funcLRtoUL :: [Float] -> [Float] -> Int -> [Float] -> [Float]
 -- base case, empty list
 funcLRtoUL g list _ [] = list
 -- find all surrounding cells of a cell and see which has the smallest distance
@@ -152,23 +183,24 @@ funcLRtoUL g beginList n endList =
         funcLRtoUL g (beginList ++ [g!!(n)]) (n+1) (tail(endList))
       else
         funcLRtoUL g (beginList ++
-                    [minimum [ abs ( g!!(n) ),
-                               abs ( g!!(n+1)   + 1),
-                               abs ( g!!(n-1)   + 1),
-                               abs ( g!!(n+col) + 1),
-                               abs ( g!!(n-col) + 1),
-                               abs ( g!!(n+col-1) + 1), --diagonals
-                               abs ( g!!(n+col+1) + 1),
-                               abs ( g!!(n-col-1) + 1),
-                               abs ( g!!(n-col+1) + 1)
-                              ]
-                    ] )   (n+1)  (tail(endList))
+        [ minimumSign [ g!!(n),
+                        g!!(n+1),
+                        g!!(n-1),
+                        g!!(n+col),
+                        g!!(n-col),
+                        g!!(n+col-1), --diagonals
+                        g!!(n+col+1),
+                        g!!(n-col-1),
+                        g!!(n-col+1)
+                  ] 0.0 0
+        ] )   (n+1)  (tail(endList))
+
 -------------------------------------------
 -- this is the outermost "boundary" function, the one with understandable parameters
 -- recieve the beginnings of a Level Set from inner boudanry function: findFun
 -- params: row number, column number, radius of circle, x center, y center
 -------------------------------------------
-findBoundaries :: Int -> Int -> Int -> Int -> Int -> [Int]
+findBoundaries :: Int -> Int -> Float -> Float -> Float -> [Float]
 findBoundaries row col radius xc yc =
   let x = (row * col - 1)
   in
@@ -184,32 +216,64 @@ findBoundaries row col radius xc yc =
 -- the greater the magnitue, the farther the cell is from the surface
 -- params: list, nCount list to iterate through, radius, x center, and y center
 -------------------------------------------
-findFunc :: [Int] -> [Int] -> Int -> Int -> Int -> [Int]
+findFunc :: [Float] -> [Int] -> Float -> Float -> Float -> [Float]
 -- base case: done iterating through intitial list
 findFunc list [] radius xc yc = list
 -- for every element in the list find whether it is inside circle, add to final list, call again on tail
 findFunc list nCount radius xc yc =
     let
     n = (head(nCount)) -- find which index we are on by getting head of list
-    x = n `div` col
-    y = n `mod` col
-    a = ( ((x-xc) ^2) + ((y-yc) ^2) )  - radius^2 -- distance from center function
+    x1 = (n `div` col)
+    y1 = (n `mod` col)
+    x = (fromIntegral x1)
+    y = (fromIntegral y1)
+    a = ( ( ((x-xc) ^2) + ((y-yc) ^2) )  - radius^2 )-- distance from center function
     in
-      findFunc (list ++ ([a]) ) (tail(nCount)) radius xc yc -- append distance from center, recurse through rest of list
+      findFunc ( list++[a] ) (tail(nCount)) radius xc yc -- append distance from center, recurse through rest of list
 
 -------------------------------------------
 --This function creates a 2d Grid from the 1d list we have been using to represent the 2d grid (easier to iterate through funcitonally)
 -- params: list and length of column
 -------------------------------------------
-createGrid :: [Int] -> Int -> [[Int]]
-createGrid list cols = chunksOf cols list
+createGrid :: [Float] -> Int -> [[Float]]
+createGrid list cols = (chunksOf cols list)
 
 
 
 --------------- TESTING ------------------------
 
-testBoundary = (findBoundaries (row) (col) 3 (row `div` 2) (col `div` 2))
-testGrid = createGrid ( fsm testBoundary) (col)
+-- main = do
+--       putStrLn "----------------------------------------"
+--       putStrLn "Testing Find Boundaries "
+--       putStrLn "Array 8 by 8, center in middle, radius 3"
+testBoundary = (findBoundaries 8 8 3.0 4.0 4.0)
+grid1 = createGrid (testBoundary) 8
+-- putStrLn "RESULT:"
+-- grid!!0
+-- grid!!1
+-- grid!!2
+-- grid!!3
+-- grid!!4
+-- grid!!5
+-- grid!!6
+-- grid!!7
+-- putStrLn "----------------------------------------"
+
+radius = 3
+testBoundary2 = (findBoundaries (row) (col) radius ((fromIntegral row) / 2.0) ((fromIntegral col) / 2.0))
+testGrid = createGrid ( fsm testBoundary2) (col)
+
+-- putStrLn
+-- putStrLn "----------------------------------------"
+-- putStrLn "Testing Minimum Sign: "
+-- putStrLn "Array [  1.0,  2.0, 3.0"
+-- putStrLn "        -0.01, 0.01, 3.0"
+-- putStrLn "         1.0,  2.0,  3.0]"
+a = minimumSign [ 1.0,  2.0, 3.0, -0.01, 0.01, 3.0, 1.0, 2.0,  3.0] 0.0 0
+-- putStrLn "RESULT:"
+-- a
+-- putStrLn "----------------------------------------"
+
 
 
 
